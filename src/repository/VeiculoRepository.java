@@ -12,9 +12,22 @@ public class VeiculoRepository {
     public VeiculoRepository(){
         veiculos = new ArrayList<>();
     }
-    public void add(Veiculo veiculo){
+    public static void add(Veiculo veiculo){
+        if(placaJaCadastrada(veiculo.getPlaca())){
+            throw new IllegalArgumentException("Placa já cadastrada");
+        }
         veiculo.setDisponibilidade(false);
         veiculos.add(veiculo);
+    }
+
+    public static boolean placaJaCadastrada(String placa) {
+        List<Veiculo> veiculos = listarTodos();
+        for (Veiculo veiculo : veiculos) {
+            if (veiculo.getPlaca().equalsIgnoreCase(placa)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void remove(Integer id){
@@ -43,6 +56,20 @@ public class VeiculoRepository {
             }
         }
         return resultado;
+    }
+
+    public Veiculo buscarPorId(Integer id){
+        List<Veiculo> resultado = new ArrayList<>();
+        for(Veiculo veiculo : veiculos){
+            if(veiculo.getId().equals(id)){
+                return veiculo;
+            }
+        }
+        return null;
+    }
+
+    public static List<Veiculo> listarTodos(){
+        return new ArrayList<>(veiculos);
     }
 
 }

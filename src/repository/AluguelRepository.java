@@ -4,52 +4,43 @@ import entity.Aluguel;
 import entity.Veiculo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AluguelRepository {
 
-    private final List<Aluguel> alugueis;
+    private final Map<Integer, Aluguel> alugueis;
 
-    public AluguelRepository(VeiculoRepository veiculoRepository){
-        this.alugueis = new ArrayList<>();
+    public AluguelRepository() {
+        this.alugueis = new HashMap<>();
     }
 
-    public void add(Aluguel aluguel){
-        alugueis.add(aluguel);
+    public void add(Aluguel aluguel) {
+        alugueis.put(aluguel.getId(), aluguel);
         Veiculo veiculo = aluguel.getVeiculo();
         veiculo.setDisponibilidade(true);
-        VeiculoRepository.alterar(veiculo);
     }
 
-    public void remove(Integer id){
+    public void remove(Integer id) {
         Aluguel aluguel = buscarPorId(id);
-        if(aluguel != null){
+        if (aluguel != null) {
             Veiculo veiculo = aluguel.getVeiculo();
             veiculo.setDisponibilidade(false);
             VeiculoRepository.alterar(veiculo);
-            alugueis.remove(aluguel);
+            alugueis.remove(id);
         }
     }
 
-    public void alterar(Aluguel aluguel){
-        for(int i = 0; i < alugueis.size(); i++){
-            if(alugueis.get(i).getId().equals(aluguel.getId())){
-                alugueis.set(i, aluguel);
-                break;
-            }
-        }
+    public void alterar(Aluguel aluguel) {
+        alugueis.put(aluguel.getId(), aluguel);
     }
 
-    public Aluguel buscarPorId(Integer id){
-        for(Aluguel aluguel : alugueis){
-            if(aluguel.getId().equals(id)){
-                return aluguel;
-            }
-        }
-        return null;
+    public Aluguel buscarPorId(Integer id) {
+        return alugueis.get(id);
     }
 
-    public List<Aluguel> listarTodos(){
-        return new ArrayList<>(alugueis);
+    public List<Aluguel> listarTodos() {
+        return new ArrayList<>(alugueis.values());
     }
 }

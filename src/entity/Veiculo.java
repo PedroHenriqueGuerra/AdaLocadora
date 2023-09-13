@@ -2,17 +2,19 @@ package entity;
 
 import enums.TipoVeiculo;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Veiculo {
 
-    private static Integer ultimoId;
+    private static Integer ultimoId = 0;
     private Integer id;
     private String placa;
     private Boolean disponibilidade;
     private TipoVeiculo tipoVeiculo;
     private String modelo;
     private String marca;
+    private BigDecimal valorDiaria;
 
     public Veiculo(String placa, TipoVeiculo tipoVeiculo, boolean disponibilidade, String modelo, String marca) {
         this.id = ultimoId++;
@@ -21,7 +23,6 @@ public class Veiculo {
         this.tipoVeiculo = tipoVeiculo;
         this.placa = placa;
         this.disponibilidade = disponibilidade;
-
     }
 
     public static Integer getUltimoId() {
@@ -103,7 +104,7 @@ public class Veiculo {
 
     @Override
     public String toString(){
-        return marca + "-" + modelo + "-" + placa;
+        return marca + "-" + modelo + "-" + placa + "-" + id;
     }
 
 }

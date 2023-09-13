@@ -1,6 +1,6 @@
 #ADA LocateCar - Locadora de Veículos
 
-R## Recursos Essenciais
+## Recursos Essenciais
 
 ### 1. Cadastro de Veículos
 - Permite cadastrar novos veículos na frota da locadora.

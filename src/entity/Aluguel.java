@@ -9,7 +9,7 @@ public class Aluguel {
 
     private static Integer ultimoId = 0;
     private Integer id;
-    private Cliente cliente;
+    private Pessoa cliente;
     private Veiculo veiculo;
     private Date dataAluguel;
     private Date dataEntrega;
@@ -17,11 +17,12 @@ public class Aluguel {
     private BigDecimal valorTotal;
     private BigDecimal desconto;
 
-    public Aluguel(Integer id, Cliente cliente, Veiculo veiculo) {
-        this.id = id;
+    public Aluguel(Pessoa cliente, Veiculo veiculo, Date dataAluguel, Date dataEntrega) {
+        this.id = ultimoId++;
         this.cliente = cliente;
         this.veiculo = veiculo;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        this.dataAluguel = dataAluguel;
+        this.dataEntrega = dataEntrega;
     }
 
     public Integer getId() {
@@ -32,11 +33,11 @@ public class Aluguel {
         this.id = id;
     }
 
-    public Cliente getCliente() {
+    public Pessoa getCliente() {
         return cliente;
     }
 
-    public void setCliente(Cliente cliente) {
+    public void setCliente(Pessoa cliente) {
         this.cliente = cliente;
     }
 
