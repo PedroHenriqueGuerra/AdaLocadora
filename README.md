@@ -50,5 +50,11 @@
 ### 3. Clientes
 - Clientes são identificados por CPF (Pessoa Física) ou CNPJ (Pessoa Jurídica).
 - Descontos são aplicados com base na duração do aluguel:
-  - Cliente Pessoa Física com mais de 5 diárias: 5% de desconto (Regra RN7).
-  - Cliente Pessoa Jurídica com mais de 3 diárias: 10% de desconto (Regra RN7).
+- Cliente Pessoa Física com mais de 5 diárias: 5% de desconto (Regra RN7).
+- Cliente Pessoa Jurídica com mais de 3 diárias: 10% de desconto (Regra RN7).
+
+
+### Desenvolvimento do projeto
+- Menu Interativo com o cliente.
+- Deve ser melhorado em relação aos tratamentos de exceções para um menu mais "limpo" para o cliente.
+
