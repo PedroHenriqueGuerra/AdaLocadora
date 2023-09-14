@@ -5,10 +5,11 @@ import entity.Cliente;
 import entity.Veiculo;
 import enums.TipoCliente;
 import enums.TipoVeiculo;
+import exceptions.*;
 import repository.AluguelRepository;
+import service.AluguelService;
 import repository.ClienteRepository;
 import repository.VeiculoRepository;
-import service.AluguelService;
 import service.ClienteService;
 import service.VeiculoService;
 
@@ -25,11 +26,11 @@ public class Menu {
     static VeiculoService veiculoService = new VeiculoService();
     static ClienteRepository<Cliente> clienteRepository = new ClienteRepository<>();
     static ClienteService<Cliente> clienteService = new ClienteService<>(clienteRepository);
-    static AluguelRepository aluguelRepository = new AluguelRepository();
-    static AluguelService aluguelService = new AluguelService(aluguelRepository, veiculoRepository);
+    static AluguelService aluguelservice = new AluguelService();
+    static AluguelRepository aluguelRepository = new AluguelRepository(aluguelservice, veiculoRepository);
     static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, VeiculoNaoEncotradoException, ClienteNaoEncontradoException {
         System.out.println("Bem-vindo à Locadora Ada. Informe a opção desejada:");
         System.out.println("1: Cadastrar veículo");
         System.out.println("2: Alterar um veículo cadastrado");
@@ -48,10 +49,9 @@ public class Menu {
                     cadastrarVeiculo();
                     break;
                 case 2:
-                    System.out.println("Informe o Id do veículo: ");
-                    veiculoService.listarTodos();
-                    Integer idVeiculo = sc.nextInt();
-                    alterarVeiculo(idVeiculo);
+                    System.out.println("Informe a placa do veículo: ");
+                    String placaVeiculo = sc.next();
+                    alterarVeiculo(placaVeiculo);
                     break;
                 case 3:
                     System.out.println("Informe o nome do veículo: ");
@@ -62,24 +62,23 @@ public class Menu {
                     cadastrarCliente();
                     break;
                 case 5:
-                    System.out.println("Informe o Id do cliente: ");
+                    System.out.println("Informe o documento do cliente: ");
                     clienteService.listarTodos();
-                    Integer idCliente = sc.nextInt();
-                    alterarCliente(idCliente);
+                    String documento = sc.next();
+                    alterarCliente(documento);
                     break;
                 case 6:
-                    System.out.println("Informe o Id do veículo que deseja alugar: ");
-                    System.out.println(veiculoService.listarTodos());
-                    Integer idVeiculoAlugar = sc.nextInt();
+                    System.out.println("Informe a placa do veiculo que deseja alugar: ");
+                    String veiculoAlugar = sc.next();
 
-                    System.out.println("Informe o Id do cliente que deseja alugar: ");
+                    System.out.println("Informe o documento do cliente que deseja alugar: ");
                     System.out.println(clienteService.listarTodos());
-                    Integer idClienteAlugar = sc.nextInt();
-                    alugarVeiculo(idVeiculoAlugar, idClienteAlugar);
+                    String documentoAlugar = sc.next();
+                    alugarVeiculo(veiculoAlugar, documentoAlugar);
                     break;
                 case 7:
                     System.out.println("Informe o Id do aluguel: ");
-                    System.out.println(aluguelService.listarTodos());
+                    System.out.println(aluguelRepository.listarTodos());
                     Integer idAluguel = sc.nextInt();
                     devolverVeiculo(idAluguel);
                     break;
@@ -103,12 +102,20 @@ public class Menu {
         String tipoVeiculoStr = sc.next();
         TipoVeiculo tipoVeiculo = TipoVeiculo.valueOf(tipoVeiculoStr.toUpperCase());
 
-        Veiculo veiculo = new Veiculo(placa, tipoVeiculo, true, modelo, marca);
-        veiculoService.add(veiculo);
+        try{
+            Veiculo veiculo = new Veiculo(placa, tipoVeiculo, true, modelo, marca);
+            veiculoService.add(veiculo);
+            System.out.println("Veiculo cadastrado.");
+        } catch (IllegalArgumentException e){
+            throw new ArgumentoInvalidoException("Tipo do veículo inválido.");
+        }
+
+
+
     }
 
-    public static void alterarVeiculo(Integer id) {
-        Veiculo veiculo = veiculoService.buscarPorId(id);
+    public static void alterarVeiculo(String placaAlterar) {
+        Veiculo veiculo = veiculoService.buscarPorPlaca(placaAlterar);
 
         if (veiculo == null) {
             System.out.println("Veículo não existe.");
@@ -123,21 +130,21 @@ public class Menu {
             String tipoVeiculoStr = sc.next();
             TipoVeiculo tipoVeiculo = TipoVeiculo.valueOf(tipoVeiculoStr.toUpperCase());
 
-            veiculo.setMarca(marca);
-            veiculo.setModelo(modelo);
-            veiculo.setPlaca(placa);
-            veiculo.setTipoVeiculo(tipoVeiculo);
-
-            veiculoService.alterar(veiculo);
-            System.out.println("Veículo alterado com sucesso.");
+            try{
+                Veiculo veiculoAlterar = new Veiculo(placa, tipoVeiculo, false, modelo, marca);
+                veiculoService.alterar(veiculoAlterar);
+                System.out.println("Veiculo alterado.");
+            } catch (IllegalArgumentException e){
+                throw new ArgumentoInvalidoException("Tipo do veiculo inválido.");
+            }
         }
     }
 
-    public static void buscarPorNome(String nome) {
+    public static void buscarPorNome(String nome) throws VeiculoNaoEncotradoException {
         List<Veiculo> veiculos = veiculoService.buscarPorNome(nome);
 
         if (veiculos == null || veiculos.isEmpty()) {
-            System.out.println("Veículo não encontrado.");
+            throw new VeiculoNaoEncotradoException("Veiculo não encontrado.");
         } else {
             System.out.println("Veículo encontrado: " + veiculos);
         }
@@ -157,19 +164,25 @@ public class Menu {
             System.out.println("Informe o CPF do cliente: ");
             String cpf = sc.next();
             cliente = new Cliente(nome, cpf, idade, tipoPessoa);
-        } else {
+            clienteService.add(cliente);
+            System.out.println("Cliente fisico cadastrado com sucesso.");
+        } else if(tipoPessoa == TipoCliente.JURIDICO) {
             System.out.println("Informe o CNPJ do cliente: ");
             String cnpj = sc.next();
             cliente = new Cliente(nome, cnpj, idade, tipoPessoa);
+            clienteService.add(cliente);
+            System.out.println("Cliente juridico cadastrado com sucesso.");
+        }
+        else {
+            throw new ArgumentoInvalidoException("Tipo de cliente invalido");
         }
 
-        clienteService.add(cliente);
-        System.out.println("Cliente cadastrado com sucesso.");
+
     }
 
 
-    public static void alterarCliente(Integer id){
-        Cliente cliente = clienteService.buscarPorId(id);
+    public static void alterarCliente(String documento){
+        Cliente cliente = clienteService.buscarPorDocumento(documento);
         if(cliente == null){
             System.out.println("Cliente não encontrado");
         }
@@ -201,16 +214,18 @@ public class Menu {
     }
 
 
-    public static void alugarVeiculo(Integer idVeiculo, Integer idCliente) throws ParseException {
-        if(veiculoService.buscarPorId(idVeiculo) == null){
-            System.out.println("Veiculo não existe.");
-        }
-        else if (clienteService.buscarPorId(idCliente) == null) {
-            System.out.println("Cliente não existe");
+    public static void alugarVeiculo(String placaAlugar, String documento) throws VeiculoNaoEncotradoException, ClienteNaoEncontradoException {
+        if(veiculoService.buscarPorPlaca(placaAlugar) == null){
+            throw new VeiculoNaoEncotradoException("Veiculo não encontrado.");
+        } else if (veiculoService.buscarPorPlaca(placaAlugar).getDisponibilidade()) {
+            throw new ObjetoCadastradoException("Veiculo já alugado.");
+
+        } else if (clienteService.buscarPorDocumento(documento) == null) {
+            throw new ClienteNaoEncontradoException("Cliente não encontrado.");
         }
         else{
-            Veiculo veiculoAlugar = veiculoService.buscarPorId(idVeiculo);
-            Cliente clienteALugar = clienteService.buscarPorId(idCliente);
+            Veiculo veiculoAlugar = veiculoService.buscarPorPlaca(placaAlugar);
+            Cliente clienteALugar = clienteService.buscarPorDocumento(documento);
             try {
                 System.out.println("Informe a data e hora do aluguel (dd/MM/yyyy HH:mm:ss)");
                 String aluguelData = sc.next() + " " + sc.next();
@@ -220,7 +235,7 @@ public class Menu {
                 String entrega = sc.next() + " " + sc.next();
                 Date dataEntrega = dateFormat.parse(entrega);
                 Aluguel aluguel = new Aluguel(clienteALugar, veiculoAlugar, dataAluguel, dataEntrega);
-                aluguelRepository.add(aluguel);
+                aluguelservice.cadastrar(aluguel);
             } catch (ParseException e){
                 System.out.println("Erro ao analisar as datas. Certifique-se de usar o formato correto (dd/MM/yyyy HH:mm:ss).");
             }
@@ -228,19 +243,19 @@ public class Menu {
     }
 
     public static void devolverVeiculo(Integer idAluguel){
-        if(aluguelRepository.buscarPorId(idAluguel) == null){
-            System.out.println("Aluguel inválido.");
+        if(aluguelservice.buscarPorId(idAluguel) == null){
+            throw new ObjetoNaoEncotradoException("Aluguel não encontrado.");
         }
         else {
-            Aluguel aluguel = aluguelRepository.buscarPorId(idAluguel);
-            aluguel.setQuantidadeDias( aluguelService.CalcularDias(aluguel.getDataEntrega(), aluguel.getDataAluguel()));
-            aluguel.setValorTotal(aluguelService.calcularValorTotal(aluguel.getVeiculo().getTipoVeiculo(), aluguel.getQuantidadeDias()));
-            aluguel.setDesconto(aluguelService.calcularDesconto(aluguel.getCliente().getTipoPessoa(), aluguel.getQuantidadeDias(), aluguel.getValorTotal()));
+            Aluguel aluguel = aluguelservice.buscarPorId(idAluguel);
+            aluguel.setQuantidadeDias( aluguelRepository.CalcularDias(aluguel.getDataEntrega(), aluguel.getDataAluguel()));
+            aluguel.setValorTotal(aluguelRepository.calcularValorTotal(aluguel.getVeiculo().getTipoVeiculo(), aluguel.getQuantidadeDias()));
+            aluguel.setDesconto(aluguelRepository.calcularDesconto(aluguel.getCliente().getTipoPessoa(), aluguel.getQuantidadeDias(), aluguel.getValorTotal()));
             System.out.println("O valor total do aluguel foi de: " + aluguel.getValorTotal());
             System.out.println("O valor do desconto foi de: " + aluguel.getDesconto());
             BigDecimal valorFinal = aluguel.getValorTotal().subtract(aluguel.getDesconto());
             System.out.println("O valor a ser pago é de: " + valorFinal);
-            aluguelService.devolver(aluguelService.devolver(aluguel));
+            aluguelRepository.devolver(aluguelRepository.devolver(aluguel));
         }
     }
 

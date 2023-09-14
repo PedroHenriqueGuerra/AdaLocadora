@@ -12,7 +12,7 @@ public class VeiculoRepository {
     public VeiculoRepository(){
         veiculos = new ArrayList<>();
     }
-    public static void add(Veiculo veiculo){
+    public static void cadastrar(Veiculo veiculo){
         if(placaJaCadastrada(veiculo.getPlaca())){
             throw new IllegalArgumentException("Placa já cadastrada");
         }
@@ -20,24 +20,7 @@ public class VeiculoRepository {
         veiculos.add(veiculo);
     }
 
-    public static boolean placaJaCadastrada(String placa) {
-        List<Veiculo> veiculos = listarTodos();
-        for (Veiculo veiculo : veiculos) {
-            if (veiculo.getPlaca().equalsIgnoreCase(placa)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
-    public void remove(Integer id){
-        for(int i = 0; i < veiculos.size(); i++){
-            if(veiculos.get(i).getId().equals(id)){
-                veiculos.remove(i);
-                break;
-            }
-        }
-    }
 
     public static void alterar(Veiculo veiculo){
         for(int i = 0; i < veiculos.size(); i++){
@@ -58,10 +41,10 @@ public class VeiculoRepository {
         return resultado;
     }
 
-    public Veiculo buscarPorId(Integer id){
+    public Veiculo buscarPorPlaca(String placa){
         List<Veiculo> resultado = new ArrayList<>();
         for(Veiculo veiculo : veiculos){
-            if(veiculo.getId().equals(id)){
+            if(veiculo.getPlaca().equals(placa)){
                 return veiculo;
             }
         }
@@ -70,6 +53,16 @@ public class VeiculoRepository {
 
     public static List<Veiculo> listarTodos(){
         return new ArrayList<>(veiculos);
+    }
+
+    public static boolean placaJaCadastrada(String placa) {
+        List<Veiculo> veiculos = listarTodos();
+        for (Veiculo veiculo : veiculos) {
+            if (veiculo.getPlaca().equalsIgnoreCase(placa)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

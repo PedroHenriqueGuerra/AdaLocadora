@@ -14,31 +14,19 @@ public class ClienteService<T extends Cliente> {
     }
 
     public void add(T cliente) {
-        clienteRepository.add(cliente);
-    }
-
-    public void remove(T cliente) {
-        clienteRepository.remove(cliente);
+        clienteRepository.cadastrar(cliente);
     }
 
     public void alterar(T cliente) {
         clienteRepository.alterar(cliente);
     }
 
-    public Cliente buscarPorId(Integer id){
-        return clienteRepository.buscarPorId(id);
+    public Cliente buscarPorDocumento(String documento){
+        return clienteRepository.buscarPorDocumento(documento);
     }
 
     public List<T> listarTodos() {
         return clienteRepository.listarTodos();
-    }
-
-    public List<T> listarClientesFisicos() {
-        return clienteRepository.listarClientesFisicos();
-    }
-
-    public List<T> listarClientesJuridicos() {
-        return clienteRepository.listarClientesJuridicos();
     }
 
 }

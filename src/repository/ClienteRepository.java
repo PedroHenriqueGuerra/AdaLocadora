@@ -15,33 +15,12 @@ public class ClienteRepository<T extends Cliente>{
         this.clientes = new ArrayList<>();
     }
 
-    public void add(T cliente) {
+    public void cadastrar(T cliente) {
         String documento = cliente.getDocumento();
         if(existeClienteComDocumento(documento)){
             throw new IllegalArgumentException("Cliente com mesmo CPF/CNPJ já existe.");
         }
         clientes.add(cliente);
-    }
-
-    public boolean existeClienteComDocumento(String documento) {
-        for (T cliente : clientes) {
-            if (cliente.getDocumento().equals(documento)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    public void remove(T cliente) {
-        Iterator<T> iterator = clientes.iterator();
-        while (iterator.hasNext()) {
-            T comparar = iterator.next();
-            if (comparar.getId().equals(cliente.getId())) {
-                iterator.remove();
-                break;
-            }
-        }
     }
 
     public void alterar(T cliente) {
@@ -53,9 +32,18 @@ public class ClienteRepository<T extends Cliente>{
         }
     }
 
-    public T buscarPorId(Integer id) {
+    public boolean existeClienteComDocumento(String documento) {
         for (T cliente : clientes) {
-            if (cliente.getId().equals(id)) {
+            if (cliente.getDocumento().equals(documento)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public T buscarPorDocumento(String documento) {
+        for (T cliente : clientes) {
+            if (cliente.getDocumento().equals(documento)) {
                 return cliente;
             }
         }
@@ -65,28 +53,6 @@ public class ClienteRepository<T extends Cliente>{
     public List<T> listarTodos() {
         return new ArrayList<>(clientes);
     }
-    public List<T> listarClientesFisicos() {
-        List<T> clientesFisicos = new ArrayList<>();
 
-        for (T cliente : clientes) {
-            if (cliente.getTipoPessoa() == TipoCliente.FISICO) {
-                clientesFisicos.add(cliente);
-            }
-        }
-
-        return clientesFisicos;
-    }
-
-    public List<T> listarClientesJuridicos() {
-        List<T> clientesJuridicos = new ArrayList<>();
-
-        for (T cliente : clientes) {
-            if (cliente.getTipoPessoa() == TipoCliente.JURIDICO) {
-                clientesJuridicos.add(cliente);
-            }
-        }
-
-        return clientesJuridicos;
-    }
 
 }

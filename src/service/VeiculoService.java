@@ -13,10 +13,7 @@ public class VeiculoService {
         this.veiculoRepository = new VeiculoRepository();
     }
     public void add(Veiculo veiculo){
-        VeiculoRepository.add(veiculo);
-    }
-    public void remove(Integer id){
-        veiculoRepository.remove(id);
+        VeiculoRepository.cadastrar(veiculo);
     }
     public void alterar(Veiculo veiculo){
         VeiculoRepository.alterar(veiculo);
@@ -26,8 +23,8 @@ public class VeiculoService {
         return veiculoRepository.buscarPorNome(nome);
     }
 
-    public Veiculo buscarPorId(Integer id){
-        return veiculoRepository.buscarPorId(id);
+    public Veiculo buscarPorPlaca(String placa){
+        return veiculoRepository.buscarPorPlaca(placa);
     }
 
     public List<Veiculo> listarTodos(){

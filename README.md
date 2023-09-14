@@ -56,5 +56,5 @@
 
 ### Desenvolvimento do projeto
 - Menu Interativo com o cliente.
-- Deve ser melhorado em relação aos tratamentos de exceções para um menu mais "limpo" para o cliente.
+
 
